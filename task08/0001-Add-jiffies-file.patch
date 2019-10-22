@@ -1,0 +1,38 @@
+From 86c2be5ee72a93ab94d289bab206e406a8597d91 Mon Sep 17 00:00:00 2001
+From: Gabriele Modena <gabriele.modena@gmail.com>
+Date: Sun, 15 Sep 2019 00:33:55 +0200
+Subject: [c140882fdd04] [PATCH 01/02] Task 08: add jiffies file
+
+---
+ hello.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/hello.c b/hello.c
+index d0eda49..a4a68d6 100644
+--- a/hello.c
++++ b/hello.c
+@@ -3,9 +3,11 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/jiffies.h>
+ 
+ #define AUTHOR_ID "c140882fdd04"
+ #define ID_PERMISSION 0666
++#define JIFFIES_PERMISSION 0444
+ 
+ struct dentry *ret;
+ 
+@@ -53,6 +55,9 @@ static int __init hello_init(void)
+ 		&id_fops))
+ 		return -ENODEV;
+ 
++	if (!debugfs_create_u32("jiffies", JIFFIES_PERMISSION, ret, (u32 *)&jiffies))
++		return -ENODEV;
++
+ 	return 0;
+ }
+ 
+-- 
+2.21.0
+
