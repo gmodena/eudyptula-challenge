@@ -1,0 +1,37 @@
+From 590fcf33a97025019e5c3b3a915fec9bbe24aa4c Mon Sep 17 00:00:00 2001
+Message-Id: <590fcf33a97025019e5c3b3a915fec9bbe24aa4c.1615652628.git.gabriele.modena@gmail.com>
+In-Reply-To: <cover.1615652628.git.gabriele.modena@gmail.com>
+References: <cover.1615652628.git.gabriele.modena@gmail.com>
+From: Gabriele Modena <gabriele.modena@gmail.com>
+Date: Sat, 13 Mar 2021 17:16:47 +0100
+Subject: [PATCH v2 3/3] staging: wimax: fix quoted string split across lines in
+ op-rfkill.c
+
+This commit fixes the following checkpatch.pl warning:
+
+WARNING: quoted string split across lines
++		dev_err(dev, "WIMAX_GNL_RFKILL: can't find RFKILL_STATE "
++			"attribute\n");
+
+Signed-off-by: Gabriele Modena <gabriele.modena@gmail.com>
+---
+ drivers/staging/wimax/op-rfkill.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/staging/wimax/op-rfkill.c b/drivers/staging/wimax/op-rfkill.c
+index 50146f7b089e..52612ed09183 100644
+--- a/drivers/staging/wimax/op-rfkill.c
++++ b/drivers/staging/wimax/op-rfkill.c
+@@ -417,8 +417,7 @@ int wimax_gnl_doit_rfkill(struct sk_buff *skb, struct genl_info *info)
+ 	dev = wimax_dev_to_dev(wimax_dev);
+ 	result = -EINVAL;
+ 	if (info->attrs[WIMAX_GNL_RFKILL_STATE] == NULL) {
+-		dev_err(dev, "WIMAX_GNL_RFKILL: can't find RFKILL_STATE "
+-			"attribute\n");
++		dev_err(dev, "WIMAX_GNL_RFKILL: can't find RFKILL_STATE attribute\n");
+ 		goto error_no_pid;
+ 	}
+ 	new_state = nla_get_u32(info->attrs[WIMAX_GNL_RFKILL_STATE]);
+-- 
+2.11.0
+

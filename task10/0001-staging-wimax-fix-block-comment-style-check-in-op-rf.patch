@@ -1,0 +1,36 @@
+From 752f22ec19c8e5bc249589ca4c5edef770396aff Mon Sep 17 00:00:00 2001
+Message-Id: <752f22ec19c8e5bc249589ca4c5edef770396aff.1615652628.git.gabriele.modena@gmail.com>
+In-Reply-To: <cover.1615652628.git.gabriele.modena@gmail.com>
+References: <cover.1615652628.git.gabriele.modena@gmail.com>
+From: Gabriele Modena <gabriele.modena@gmail.com>
+Date: Sat, 13 Mar 2021 17:10:33 +0100
+Subject: [PATCH v2 1/3] staging: wimax: fix block comment style check in
+ op-rfkill.c
+
+This commit fixes the following checkpatch.pl warning:
+
+WARNING: Block comments use a trailing */ on a separate line
++		 * considering the radios are all off. */
+
+Signed-off-by: Gabriele Modena <gabriele.modena@gmail.com>
+---
+ drivers/staging/wimax/op-rfkill.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/staging/wimax/op-rfkill.c b/drivers/staging/wimax/op-rfkill.c
+index 78b294481a59..ad9d1c682ca2 100644
+--- a/drivers/staging/wimax/op-rfkill.c
++++ b/drivers/staging/wimax/op-rfkill.c
+@@ -294,7 +294,8 @@ int wimax_rfkill(struct wimax_dev *wimax_dev, enum wimax_rf_state state)
+ 		/* While initializing, < 1.4.3 wimax-tools versions use
+ 		 * this call to check if the device is a valid WiMAX
+ 		 * device; so we allow it to proceed always,
+-		 * considering the radios are all off. */
++		 * considering the radios are all off.
++		 */
+ 		if (result == -ENOMEDIUM && state == WIMAX_RF_QUERY)
+ 			result = WIMAX_RF_OFF << 1 | WIMAX_RF_OFF;
+ 		goto error_not_ready;
+-- 
+2.11.0
+

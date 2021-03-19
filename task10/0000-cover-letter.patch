@@ -1,0 +1,32 @@
+From 590fcf33a97025019e5c3b3a915fec9bbe24aa4c Mon Sep 17 00:00:00 2001
+Message-Id: <cover.1615652628.git.gabriele.modena@gmail.com>
+From: Gabriele Modena <gabriele.modena@gmail.com>
+Date: Sat, 13 Mar 2021 17:23:48 +0100
+Subject: [PATCH v2 0/3] staging: wimax: fix style check warnings
+
+
+Fix style warnings reported by checkpatch.pl on op-rfkill.c
+by moving */ on a separate line in a block comment,
+adding a missing blank line after declarations,
+and reformatting a quoted string split across lines.
+
+Resubmitting so that each style warning is addressed in a separate
+commit.
+
+This patch is both an attempt to address the warnings, as well as 
+a way for me to familiarise with the linux kernel contribution 
+process, by following tasks proposed by a popular online challenge.
+
+
+
+Gabriele Modena (3):
+  staging: wimax: fix block comment style check in op-rfkill.c
+  staging: wimax: add a blank line after declaration in op-rfkill.c
+  staging: wimax: fix quoted string split across lines in op-rfkill.c
+
+ drivers/staging/wimax/op-rfkill.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+-- 
+2.11.0
+

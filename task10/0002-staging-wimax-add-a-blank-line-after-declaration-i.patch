@@ -1,0 +1,35 @@
+From 1ee3795245816a81609749c82c3d369ea0cbf466 Mon Sep 17 00:00:00 2001
+Message-Id: <1ee3795245816a81609749c82c3d369ea0cbf466.1615652628.git.gabriele.modena@gmail.com>
+In-Reply-To: <cover.1615652628.git.gabriele.modena@gmail.com>
+References: <cover.1615652628.git.gabriele.modena@gmail.com>
+From: Gabriele Modena <gabriele.modena@gmail.com>
+Date: Sat, 13 Mar 2021 17:14:18 +0100
+Subject: [PATCH v2 2/3] staging: wimax: add a blank line after declaration in
+ op-rfkill.c
+
+This commit fixes the following checkpatch.pl warning:
+
+WARNING: Missing a blank line after declarations
++	struct device *dev = wimax_dev_to_dev(wimax_dev);
++	d_fnstart(3, dev, "(wimax_dev %p)\n", wimax_dev);
+
+Signed-off-by: Gabriele Modena <gabriele.modena@gmail.com>
+---
+ drivers/staging/wimax/op-rfkill.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/staging/wimax/op-rfkill.c b/drivers/staging/wimax/op-rfkill.c
+index ad9d1c682ca2..50146f7b089e 100644
+--- a/drivers/staging/wimax/op-rfkill.c
++++ b/drivers/staging/wimax/op-rfkill.c
+@@ -379,6 +379,7 @@ int wimax_rfkill_add(struct wimax_dev *wimax_dev)
+ void wimax_rfkill_rm(struct wimax_dev *wimax_dev)
+ {
+ 	struct device *dev = wimax_dev_to_dev(wimax_dev);
++
+ 	d_fnstart(3, dev, "(wimax_dev %p)\n", wimax_dev);
+ 	rfkill_unregister(wimax_dev->rfkill);
+ 	rfkill_destroy(wimax_dev->rfkill);
+-- 
+2.11.0
+
