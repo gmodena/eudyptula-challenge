@@ -1,0 +1,18 @@
+$ dmesg | tail -n 1
+[ 4886.764128] usb 1-2: dvb_usb_v2: 'Realtek RTL2832U reference design' successfully initialized and connected
+
+
+$ cat /sys/bus/usb/devices/1-2/1-2\:1.0/id 
+c140882fdd0
+
+$ echo abc > /sys/bus/usb/devices/1-2/1-2\:1.0/id
+bash: echo: write error: Invalid argument
+
+$ echo echo c140882fdd04 > /sys/bus/usb/devices/1-2/1-2\:1.0/id 
+$ echo $?
+0
+
+$ ~/linux/scripts/checkpatch.pl 0001-Add-a-sysfs-id-object-for-rtl28xxu-devices.patch
+total: 0 errors, 0 warnings, 56 lines checked
+
+0001-Add-a-sysfs-id-object-for-rtl28xxu-devices.patch has no obvious style problems and is ready for submission.

@@ -1,0 +1,80 @@
+From 129b4ce82de59e6352eede81fed1de9478ed3031 Mon Sep 17 00:00:00 2001
+From: Gabriele Modena <gabriele.modena@gmail.com>
+Date: Sun, 28 Mar 2021 13:34:37 +0200
+Subject: [PATCH] Add a sysfs id object for rtl28xxu devices.
+
+This patch adds an object with read/write permission
+to the device tree of rtl28xxu devices.
+
+Signed-off-by: Gabriele Modena <gabriele.modena@gmail.com>
+---
+ drivers/media/usb/dvb-usb-v2/rtl28xxu.c | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/media/usb/dvb-usb-v2/rtl28xxu.c b/drivers/media/usb/dvb-usb-v2/rtl28xxu.c
+index 97ed17a141bb..4e864d552167 100644
+--- a/drivers/media/usb/dvb-usb-v2/rtl28xxu.c
++++ b/drivers/media/usb/dvb-usb-v2/rtl28xxu.c
+@@ -9,6 +9,28 @@
+ 
+ #include "rtl28xxu.h"
+ 
++#define AUTHOR_ID "c140882fdd04"
++
++
++static ssize_t id_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	strncpy(buf, AUTHOR_ID, strlen(AUTHOR_ID));
++	return strlen(AUTHOR_ID);
++}
++
++static ssize_t id_store(struct device *dev, struct device_attribute *attr,
++		const char *buf, size_t count)
++{
++	if ((strlen(AUTHOR_ID) != count-1) || strncmp(buf, AUTHOR_ID, strlen(AUTHOR_ID) != 0))
++		return -EINVAL;
++
++	strncpy(buf, AUTHOR_ID, count);
++	return count;
++}
++
++static DEVICE_ATTR_RW(id);
++
++
+ static int rtl28xxu_disable_rc;
+ module_param_named(disable_rc, rtl28xxu_disable_rc, int, 0644);
+ MODULE_PARM_DESC(disable_rc, "disable RTL2832U remote controller");
+@@ -1369,7 +1391,6 @@ static int rtl2832u_tuner_attach(struct dvb_usb_adapter *adap)
+ 	default:
+ 		dev_dbg(&d->intf->dev, "no SDR for tuner=%d\n", dev->tuner);
+ 	}
+-
+ 	return 0;
+ err:
+ 	dev_dbg(&d->intf->dev, "failed=%d\n", ret);
+@@ -1378,7 +1399,13 @@ static int rtl2832u_tuner_attach(struct dvb_usb_adapter *adap)
+ 
+ static int rtl28xxu_tuner_attach(struct dvb_usb_adapter *adap)
+ {
++	int err;
+ 	struct rtl28xxu_dev *dev = adap_to_priv(adap);
++	struct dvb_usb_device *d = adap_to_d(adap);
++
++	err = device_create_file(&d->intf->dev, &dev_attr_id);
++	if (err)
++		return -ENOMEM;
+ 
+ 	if (dev->chip_id == CHIP_ID_RTL2831U)
+ 		return rtl2831u_tuner_attach(adap);
+@@ -1406,7 +1433,7 @@ static int rtl28xxu_tuner_detach(struct dvb_usb_adapter *adap)
+ 		module_put(client->dev.driver->owner);
+ 		i2c_unregister_device(client);
+ 	}
+-
++	device_remove_file(&d->intf->dev, &dev_attr_id);
+ 	return 0;
+ }
+ 
+-- 
+2.11.0
+
