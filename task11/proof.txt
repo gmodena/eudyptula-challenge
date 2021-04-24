@@ -8,7 +8,7 @@ c140882fdd0
 $ echo abc > /sys/bus/usb/devices/1-2/1-2\:1.0/id
 bash: echo: write error: Invalid argument
 
-$ echo echo c140882fdd04 > /sys/bus/usb/devices/1-2/1-2\:1.0/id 
+$ echo c140882fdd04 > /sys/bus/usb/devices/1-2/1-2\:1.0/id 
 $ echo $?
 0
 
