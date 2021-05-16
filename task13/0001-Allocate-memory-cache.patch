@@ -1,4 +1,4 @@
-From 62ff24febae8a842feeb673964112f7fc1248ebf Mon Sep 17 00:00:00 2001
+From 4dea84d9087ecf2caee195b64b4a87ff2d65776f Mon Sep 17 00:00:00 2001
 From: Gabriele Modena <gabriele.modena@gmail.com>
 Date: Sat, 15 May 2021 12:39:21 +0200
 Subject: [PATCH] Allocate memory cache
@@ -8,11 +8,11 @@ instead of the general pool.
 
 Signed-off-by: Gabriele Modena <gabriele.modena@gmail.com>
 ---
- task13/identity.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ task13/identity.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/task13/identity.c b/task13/identity.c
-index 31906e1..8f2cb4e 100644
+index 31906e1..bd77feb 100644
 --- a/task13/identity.c
 +++ b/task13/identity.c
 @@ -8,6 +8,8 @@
@@ -24,17 +24,8 @@ index 31906e1..8f2cb4e 100644
  struct identity {
  	char name[MAX_NAME_LEN];
  	int id;
-@@ -18,9 +20,16 @@ struct identity {
- // init list at compile time
- LIST_HEAD(identity_list);
+@@ -20,7 +22,7 @@ LIST_HEAD(identity_list);
  
-+// avoid to merge identity_cache with the others,
-+// and ensure that stats show up in slabinfo
-+static void identity_constructor(void *addr)
-+{
-+	memset(addr, 0, sizeof(struct identity));
-+}
-+
  int identity_create(char *name, int id)
  {
 -	struct identity *entry = kmalloc(sizeof(struct identity), GFP_KERNEL);
@@ -42,7 +33,7 @@ index 31906e1..8f2cb4e 100644
  
  	if (entry == NULL)
  		return -ENOMEM;
-@@ -50,7 +59,7 @@ void identity_destroy(int id)
+@@ -50,7 +52,7 @@ void identity_destroy(int id)
  
  	if (entry != NULL) {
  		list_del(&entry->node);
@@ -51,19 +42,19 @@ index 31906e1..8f2cb4e 100644
  	}
  }
  
-@@ -60,6 +69,11 @@ static int __init identity_init(void)
+@@ -60,6 +62,11 @@ static int __init identity_init(void)
  	struct identity *temp;
  	int ret = 0;
  
 +	identity_cache = kmem_cache_create("eudyptula_identity",
-+		sizeof(struct identity), 0, 0, identity_constructor);
++		sizeof(struct identity), 0, 0, NULL);
 +	if (identity_cache == NULL)
 +		return -ENOMEM;
 +
  	ret = identity_create("Alice", 1);
  	if (ret)
  		return ret;
-@@ -94,7 +108,8 @@ static int __init identity_init(void)
+@@ -94,7 +101,8 @@ static int __init identity_init(void)
  
  static void __exit identity_exit(void)
  {
