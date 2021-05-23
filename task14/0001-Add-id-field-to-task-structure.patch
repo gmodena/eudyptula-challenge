@@ -1,0 +1,89 @@
+From 970115879d6b3f0c094fcc218f83ce2cddeafec2 Mon Sep 17 00:00:00 2001
+From: Gabriele Modena <gabriele.modena@gmail.com>
+Date: Sun, 23 May 2021 20:55:43 +0200
+Subject: [PATCH] Add id field to task structure.
+
+This patchs adds a new id field to the core
+task struct. The field is initialised to the eudyptula
+challenge id, and monotonically increased upon a read access
+at /proc/<pid>/id.
+
+Signed-off-by: Gabriele Modena <gabriele.modena@gmail.com>
+---
+ fs/proc/base.c        | 8 ++++++++
+ include/linux/sched.h | 5 ++++-
+ kernel/fork.c         | 2 +-
+ 3 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/fs/proc/base.c b/fs/proc/base.c
+index 3851bfcdba56..dca2d3a193f7 100644
+--- a/fs/proc/base.c
++++ b/fs/proc/base.c
+@@ -353,6 +353,13 @@ static ssize_t get_task_cmdline(struct task_struct *tsk, char __user *buf,
+ 	return ret;
+ }
+ 
++static int proc_pid_id(struct seq_file *m, struct pid_namespace *ns,
++		 struct pid *pid, struct task_struct *task)
++{
++	seq_printf(m, "%llu\n", task->id++);
++	return 0;
++}
++
+ static ssize_t proc_pid_cmdline_read(struct file *file, char __user *buf,
+ 				     size_t count, loff_t *pos)
+ {
+@@ -3265,6 +3272,7 @@ static const struct pid_entry tgid_base_stuff[] = {
+ #ifdef CONFIG_SECCOMP_CACHE_DEBUG
+ 	ONE("seccomp_cache", S_IRUSR, proc_pid_seccomp_cache),
+ #endif
++	ONE("id", 0444, proc_pid_id)
+ };
+ 
+ static int proc_tgid_base_readdir(struct file *file, struct dir_context *ctx)
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index d2c881384517..bca1a26eed82 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -668,7 +668,8 @@ struct task_struct {
+ 	/* Per task flags (PF_*), defined further below: */
+ 	unsigned int			flags;
+ 	unsigned int			ptrace;
+-
++	/* Eudyptula challenge user id */
++	u64 id;
+ #ifdef CONFIG_SMP
+ 	int				on_cpu;
+ 	struct __call_single_node	wake_entry;
+@@ -1389,6 +1390,8 @@ struct task_struct {
+ 	 */
+ 	randomized_struct_fields_end
+ 
++
++
+ 	/* CPU-specific state of this task: */
+ 	struct thread_struct		thread;
+ 
+diff --git a/kernel/fork.c b/kernel/fork.c
+index dc06afd725cb..719cf7544d8e 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -2467,7 +2467,6 @@ pid_t kernel_clone(struct kernel_clone_args *args)
+ 	struct task_struct *p;
+ 	int trace = 0;
+ 	pid_t nr;
+-
+ 	/*
+ 	 * For legacy clone() calls, CLONE_PIDFD uses the parent_tid argument
+ 	 * to return the pidfd. Hence, CLONE_PIDFD and CLONE_PARENT_SETTID are
+@@ -2501,6 +2500,7 @@ pid_t kernel_clone(struct kernel_clone_args *args)
+ 	}
+ 
+ 	p = copy_process(NULL, trace, NUMA_NO_NODE, args);
++	p->id = 0xc140882fdd04;
+ 	add_latent_entropy();
+ 
+ 	if (IS_ERR(p))
+-- 
+2.11.0
+
