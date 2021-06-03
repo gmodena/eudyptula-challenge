@@ -1,0 +1,80 @@
+From e8d381337b69da1469e1ed10cde39d5709b47105 Mon Sep 17 00:00:00 2001
+From: Gabriele Modena <gabriele.modena@gmail.com>
+Date: Thu, 3 Jun 2021 23:41:32 +0200
+Subject: [PATCH] Add a sys_eudyptula syscall.
+
+sys_eudyptula will take the two values, mush them together into one
+64bit value. If the id value matches
+"c140882fdd04", then the syscall returns success.
+
+Signed-off-by: Gabriele Modena <gabriele.modena@gmail.com>
+---
+ arch/x86/entry/syscalls/syscall_64.tbl |  1 +
+ include/linux/syscalls.h               |  1 +
+ include/uapi/asm-generic/unistd.h      |  5 ++++-
+ kernel/sys.c                           | 11 +++++++++++
+ 4 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+index ecd551b08d05..61f50f1333f3 100644
+--- a/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -368,6 +368,7 @@
+ 444	common	landlock_create_ruleset	sys_landlock_create_ruleset
+ 445	common	landlock_add_rule	sys_landlock_add_rule
+ 446	common	landlock_restrict_self	sys_landlock_restrict_self
++447	64	eudyptula		sys_eudyptula
+ 
+ #
+ # Due to a historical design error, certain syscalls are numbered differently
+diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+index 050511e8f1f8..f3d6c173e33d 100644
+--- a/include/linux/syscalls.h
++++ b/include/linux/syscalls.h
+@@ -1050,6 +1050,7 @@ asmlinkage long sys_landlock_create_ruleset(const struct landlock_ruleset_attr _
+ asmlinkage long sys_landlock_add_rule(int ruleset_fd, enum landlock_rule_type rule_type,
+ 		const void __user *rule_attr, __u32 flags);
+ asmlinkage long sys_landlock_restrict_self(int ruleset_fd, __u32 flags);
++asmlinkage long sys_eudyptula(unsigned int high_id, unsigned int low_id);
+ 
+ /*
+  * Architecture-specific system calls
+diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
+index 6de5a7fc066b..4b996691daf7 100644
+--- a/include/uapi/asm-generic/unistd.h
++++ b/include/uapi/asm-generic/unistd.h
+@@ -873,8 +873,11 @@ __SYSCALL(__NR_landlock_add_rule, sys_landlock_add_rule)
+ #define __NR_landlock_restrict_self 446
+ __SYSCALL(__NR_landlock_restrict_self, sys_landlock_restrict_self)
+ 
++#define __NR_eudyptula 447
++__SYSCALL(__NR_eudyptula, sys_eudyptula)
++
+ #undef __NR_syscalls
+-#define __NR_syscalls 447
++#define __NR_syscalls 448
+ 
+ /*
+  * 32 bit systems traditionally used different
+diff --git a/kernel/sys.c b/kernel/sys.c
+index 3a583a29815f..bd9da29b9f25 100644
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2715,3 +2715,14 @@ COMPAT_SYSCALL_DEFINE1(sysinfo, struct compat_sysinfo __user *, info)
+ 	return 0;
+ }
+ #endif /* CONFIG_COMPAT */
++
++SYSCALL_DEFINE2(eudyptula, unsigned int, high_id, unsigned int, low_id)
++{
++	u64 eudyptula_id = 0xc140882fdd04;
++
++	if (((u64) high_id << 32 | (u64) low_id) == eudyptula_id)
++		return 0;
++	return -EINVAL;
++
++
++}
+-- 
+2.11.0
+
